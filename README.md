@@ -1,2 +1,2 @@
 # builtin
-infra.go builtin.
+infra.Go builtin.
