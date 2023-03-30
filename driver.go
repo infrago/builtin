@@ -9,6 +9,7 @@ import (
 	_ "github.com/infrago/log-default"
 	_ "github.com/infrago/mutex-default"
 	_ "github.com/infrago/queue-default"
+	_ "github.com/infrago/session-default"
 	_ "github.com/infrago/store-default"
 	_ "github.com/infrago/view-default"
 )
