@@ -44,7 +44,7 @@ func init() {
 			}
 			return fmt.Sprintf("%v", value)
 		},
-	}, false)
+	})
 
 	infra.Register("any", infra.Type{
 		Name: "任意类型", Text: "任意类型",
@@ -54,7 +54,7 @@ func init() {
 		Value: func(value Any, config Var) Any {
 			return value
 		},
-	}, false)
+	})
 
 	infra.Register("[any]", infra.Type{
 		Name: "Anys类型", Text: "Anys类型",
@@ -75,7 +75,7 @@ func init() {
 			}
 			return []Map{}
 		},
-	}, false)
+	})
 
 	infra.Register("map", infra.Type{
 		Name: "MAP类型", Text: "MAP类型",
@@ -110,7 +110,7 @@ func init() {
 			}
 			return Map{}
 		},
-	}, false)
+	})
 
 	infra.Register("[map]", infra.Type{
 		Name: "MAPS类型", Text: "MAPS类型",
@@ -143,7 +143,7 @@ func init() {
 			}
 			return []Map{}
 		},
-	}, false)
+	})
 
 	//---------- bool begin ----------------------------------
 	infra.Register("bool", infra.Type{
@@ -200,7 +200,7 @@ func init() {
 
 			return false
 		},
-	}, false)
+	})
 
 	infra.Register("[bool]", infra.Type{
 		Name: "布尔型数组", Text: "布尔型数组",
@@ -346,7 +346,7 @@ func init() {
 
 			return false
 		},
-	}, false)
+	})
 	//----------- bool end ---------------
 
 	//---------- int begin ----------------------------------
@@ -394,7 +394,7 @@ func init() {
 
 			return int64(0)
 		},
-	}, false)
+	})
 
 	infra.Register("[int]", infra.Type{
 		Name: "整型数组", Text: "整型数组",
@@ -677,7 +677,7 @@ func init() {
 
 			return []int64{}
 		},
-	}, false)
+	})
 
 	//---------- int end ----------------------------------
 
@@ -717,7 +717,7 @@ func init() {
 
 			return strings.TrimSpace(vvv)
 		},
-	}, false)
+	})
 
 	infra.Register("[string]", infra.Type{
 		Name: "字符数组", Text: "字符数组",
@@ -825,7 +825,7 @@ func init() {
 				return v
 			}
 		},
-	}, false)
+	})
 
 	infra.Register("[line]", infra.Type{
 		Name: "字符分行数组", Text: "字符分行数组",
@@ -873,7 +873,7 @@ func init() {
 				return []string{}
 			}
 		},
-	}, false)
+	})
 	//---------- string end ----------------------------------
 
 	//---------- datetime begin ----------------------------------
@@ -919,7 +919,7 @@ func init() {
 
 			return value
 		},
-	}, false)
+	})
 
 	infra.Register("[date]", infra.Type{
 		Name: "日期时间数组", Text: "日期时间数组",
@@ -960,7 +960,7 @@ func init() {
 
 			return value
 		},
-	}, false)
+	})
 
 	infra.Register("datetime", infra.Type{
 		Name: "日期时间", Text: "日期时间",
@@ -1002,7 +1002,7 @@ func init() {
 			}
 			return value
 		},
-	}, false)
+	})
 
 	infra.Register("[datetime]", infra.Type{
 		Name: "日期时间数组", Text: "日期时间数组",
@@ -1029,7 +1029,7 @@ func init() {
 				return v
 			}
 		},
-	}, false)
+	})
 
 	infra.Register("timestamp", infra.Type{
 		Name: "时间戳", Text: "时间戳",
@@ -1059,7 +1059,7 @@ func init() {
 
 			return value
 		},
-	}, false)
+	})
 
 	infra.Register("[timestamp]", infra.Type{
 		Name: "时间戳数组", Text: "时间戳数组",
@@ -1100,7 +1100,7 @@ func init() {
 
 			return value
 		},
-	}, false)
+	})
 
 	//---------- datetime end ----------------------------------
 
@@ -1124,7 +1124,7 @@ func init() {
 		Value: func(value Any, config Var) Any {
 			return fmt.Sprintf("%v", value)
 		},
-	}, false)
+	})
 
 	infra.Register("[enum]", infra.Type{
 		Name: "枚举数组", Text: "枚举数组",
@@ -1232,7 +1232,7 @@ func init() {
 			}
 			return vals
 		},
-	}, false)
+	})
 
 	//---------- enum end ----------------------------------
 
@@ -1257,7 +1257,7 @@ func init() {
 			}
 			return value
 		},
-	}, false)
+	})
 
 	infra.Register("[file]", infra.Type{
 		Name: "文件数组", Text: "文件数组",
@@ -1282,7 +1282,7 @@ func init() {
 			}
 			return []Map{}
 		},
-	}, false)
+	})
 
 	//---------- file end ----------------------------------
 
@@ -1354,7 +1354,7 @@ func init() {
 
 			return float64(0.0)
 		},
-	}, false)
+	})
 
 	infra.Register("[float]", infra.Type{
 		Name: "浮点数组", Text: "浮点数组",
@@ -1589,7 +1589,7 @@ func init() {
 
 			return []float64{}
 		},
-	}, false)
+	})
 
 	//---------- float end ----------------------------------
 
@@ -1614,7 +1614,7 @@ func init() {
 			}
 			return Map{}
 		},
-	}, false)
+	})
 
 	infra.Register("[image]", infra.Type{
 		Name: "image数组", Text: "image数组",
@@ -1639,7 +1639,7 @@ func init() {
 			}
 			return []Map{}
 		},
-	}, false)
+	})
 
 	infra.Register("audio", infra.Type{
 		Name: "audio", Text: "audio",
@@ -1660,7 +1660,7 @@ func init() {
 			}
 			return Map{}
 		},
-	}, false)
+	})
 
 	infra.Register("[audio]", infra.Type{
 		Name: "audio数组", Text: "audio数组",
@@ -1685,7 +1685,7 @@ func init() {
 			}
 			return []Map{}
 		},
-	}, false)
+	})
 
 	infra.Register("video", infra.Type{
 		Name: "video", Text: "video",
@@ -1706,7 +1706,7 @@ func init() {
 			}
 			return Map{}
 		},
-	}, false)
+	})
 
 	infra.Register("[video]", infra.Type{
 		Name: "video数组", Text: "video数组",
@@ -1731,7 +1731,7 @@ func init() {
 			}
 			return []Map{}
 		},
-	}, false)
+	})
 
 	//---------- image end ----------------------------------
 
@@ -1768,7 +1768,7 @@ func init() {
 			}
 			return value
 		},
-	}, false)
+	})
 
 	infra.Register("[json]", infra.Type{
 		Name: "JSON数组", Text: "JSON数组",
@@ -1820,6 +1820,6 @@ func init() {
 			}
 			return []Map{}
 		},
-	}, false)
+	})
 
 }

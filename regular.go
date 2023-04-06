@@ -37,10 +37,10 @@ func init() {
 
 	for k, v := range regulars {
 		if vv, ok := v.(string); ok {
-			infra.Register(k, infra.Regular{vv}, false)
+			infra.Register(k, infra.Regular{vv})
 		}
 		if vvs, ok := v.([]string); ok {
-			infra.Register(k, infra.Regular(vvs), false)
+			infra.Register(k, infra.Regular(vvs))
 		}
 	}
 
