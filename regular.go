@@ -1,13 +1,13 @@
 package builtin
 
 import (
-	. "github.com/infrago/base"
+	"github.com/infrago/base"
 	"github.com/infrago/infra"
 )
 
 func init() {
 
-	regulars := Map{
+	regulars := base.Map{
 		"password": `^[0-9A-Fa-f]{40}$`,
 		"number":   `^[0-9]+$`,
 		"float":    `^[0-9]+$`,

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	. "github.com/infrago/base"
+	"github.com/infrago/base"
 	"github.com/infrago/infra"
 	"github.com/infrago/view"
 )
@@ -31,7 +31,7 @@ func init() {
 
 	infra.Register("round", view.Helper{
 		Name: "四舍六入", Desc: "四舍六入",
-		Action: func(val float64, precisions ...Any) string {
+		Action: func(val float64, precisions ...base.Any) string {
 			precision := 2
 
 			if len(precisions) > 0 {
@@ -57,7 +57,7 @@ func init() {
 
 	infra.Register("raw", view.Helper{
 		Name: "原始输出", Desc: "原始输出",
-		Action: func(sss Any) template.HTML {
+		Action: func(sss base.Any) template.HTML {
 			if sss != nil {
 				return template.HTML(fmt.Sprintf("%v", sss))
 			}
@@ -67,7 +67,7 @@ func init() {
 
 	infra.Register("html", view.Helper{
 		Name: "输出HTML", Desc: "输出HTML，和raw一个意思",
-		Action: func(sss Any) template.HTML {
+		Action: func(sss base.Any) template.HTML {
 			if sss != nil {
 				return template.HTML(fmt.Sprintf("%v", sss))
 			}
@@ -77,7 +77,7 @@ func init() {
 
 	infra.Register("attr", view.Helper{
 		Name: "HTML属性输出", Desc: "HTML属性输出，因为GO模板会自动转义html",
-		Action: func(text Any) template.HTMLAttr {
+		Action: func(text base.Any) template.HTMLAttr {
 			if text != nil {
 				return template.HTMLAttr(fmt.Sprintf("%v", text))
 			}
@@ -87,7 +87,7 @@ func init() {
 
 	infra.Register("url", view.Helper{
 		Name: "Url输出", Desc: "Url输出，因为GO模板会自动转义html",
-		Action: func(text Any) template.URL {
+		Action: func(text base.Any) template.URL {
 			if text != nil {
 				return template.URL(fmt.Sprintf("%v", text))
 			}
@@ -97,7 +97,7 @@ func init() {
 
 	infra.Register("join", view.Helper{
 		Name: "数组join输出", Desc: "数组join输出",
-		Action: func(a Any, s string) template.HTML {
+		Action: func(a base.Any, s string) template.HTML {
 			strs := []string{}
 
 			if a != nil {
@@ -107,7 +107,7 @@ func init() {
 					for _, v := range vv {
 						strs = append(strs, v)
 					}
-				case []Any:
+				case []base.Any:
 					for _, v := range vv {
 						strs = append(strs, fmt.Sprintf("%v", v))
 					}
@@ -149,7 +149,7 @@ func init() {
 
 	infra.Register("json", view.Helper{
 		Name: "json输出", Desc: "json输出",
-		Action: func(data Any) template.HTML {
+		Action: func(data base.Any) template.HTML {
 			if data != nil {
 				bytes, err := infra.MarshalJSON(data)
 				if err == nil {
@@ -162,8 +162,8 @@ func init() {
 
 	infra.Register("mapping", view.Helper{
 		Name: "生成Map", Desc: "生成Map",
-		Action: func(args ...Any) Map {
-			m := Map{}
+		Action: func(args ...base.Any) base.Map {
+			m := base.Map{}
 
 			k := ""
 			for i, v := range args {
@@ -187,7 +187,7 @@ func init() {
 
 	infra.Register("in", view.Helper{
 		Name: "判断某个值是否在数组", Desc: "判断某个值是否在数组",
-		Action: func(val Any, arrs ...Any) bool {
+		Action: func(val base.Any, arrs ...base.Any) bool {
 
 			strVal := fmt.Sprintf("%v", val)
 			strArr := []string{}
@@ -198,7 +198,7 @@ func init() {
 				}
 			} else {
 				switch vv := arrs[0].(type) {
-				case []Any:
+				case []base.Any:
 					{
 						for _, v := range vv {
 							strArr = append(strArr, fmt.Sprintf("%v", v))
@@ -245,7 +245,7 @@ func init() {
 
 	infra.Register("out", view.Helper{
 		Name: "输出输组某下标元素", Desc: "输出输组某下标元素",
-		Action: func(arr Any, i int) string {
+		Action: func(arr base.Any, i int) string {
 
 			strArr := []string{}
 

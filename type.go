@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	. "github.com/infrago/base"
+	"github.com/infrago/base"
 	"github.com/infrago/infra"
 )
 
@@ -19,7 +19,7 @@ func init() {
 
 	infra.Register("password", infra.Type{
 		Name: "密码", Text: "密码",
-		Valid: func(value Any, config Var) bool {
+		Valid: func(value base.Any, config base.Var) bool {
 			if value == nil {
 				return false
 			}
@@ -33,7 +33,7 @@ func init() {
 			}
 			return true
 		},
-		Value: func(value Any, config Var) Any {
+		Value: func(value base.Any, config base.Var) base.Any {
 			switch v := value.(type) {
 			case string:
 				if infra.Match("password", v) {
@@ -48,44 +48,44 @@ func init() {
 
 	infra.Register("any", infra.Type{
 		Name: "任意类型", Text: "任意类型",
-		Valid: func(value Any, config Var) bool {
+		Valid: func(value base.Any, config base.Var) bool {
 			return true
 		},
-		Value: func(value Any, config Var) Any {
+		Value: func(value base.Any, config base.Var) base.Any {
 			return value
 		},
 	})
 
 	infra.Register("[any]", infra.Type{
-		Name: "Anys类型", Text: "Anys类型",
-		Valid: func(value Any, config Var) bool {
+		Name: "base.Anys类型", Text: "base.Anys类型",
+		Valid: func(value base.Any, config base.Var) bool {
 			return true
 		},
-		Value: func(value Any, config Var) Any {
+		Value: func(value base.Any, config base.Var) base.Any {
 			switch v := value.(type) {
-			case Any:
+			case base.Any:
 				{
-					return []Any{v}
+					return []base.Any{v}
 				}
-			case []Any:
+			case []base.Any:
 				{
 					return v
 				}
 			default:
 			}
-			return []Map{}
+			return []base.Map{}
 		},
 	})
 
 	infra.Register("map", infra.Type{
 		Name: "MAP类型", Text: "MAP类型",
-		Valid: func(value Any, config Var) bool {
+		Valid: func(value base.Any, config base.Var) bool {
 			switch value.(type) {
-			case Map:
+			case base.Map:
 				{
 					return true
 				}
-			case []Map:
+			case []base.Map:
 				{
 					return true
 				}
@@ -94,13 +94,13 @@ func init() {
 
 			return false
 		},
-		Value: func(value Any, config Var) Any {
+		Value: func(value base.Any, config base.Var) base.Any {
 			switch v := value.(type) {
-			case Map:
+			case base.Map:
 				{
 					return v
 				}
-			case []Map:
+			case []base.Map:
 				{
 					if len(v) > 0 {
 						return v[0]
@@ -108,19 +108,19 @@ func init() {
 				}
 			default:
 			}
-			return Map{}
+			return base.Map{}
 		},
 	})
 
 	infra.Register("[map]", infra.Type{
 		Name: "MAPS类型", Text: "MAPS类型",
-		Valid: func(value Any, config Var) bool {
+		Valid: func(value base.Any, config base.Var) bool {
 			switch value.(type) {
-			case Map:
+			case base.Map:
 				{
 					return true
 				}
-			case []Map:
+			case []base.Map:
 				{
 					return true
 				}
@@ -129,26 +129,26 @@ func init() {
 
 			return false
 		},
-		Value: func(value Any, config Var) Any {
+		Value: func(value base.Any, config base.Var) base.Any {
 			switch v := value.(type) {
-			case Map:
+			case base.Map:
 				{
-					return []Map{v}
+					return []base.Map{v}
 				}
-			case []Map:
+			case []base.Map:
 				{
 					return v
 				}
 			default:
 			}
-			return []Map{}
+			return []base.Map{}
 		},
 	})
 
 	//---------- bool begin ----------------------------------
 	infra.Register("bool", infra.Type{
 		Name: "布尔型", Text: "布尔型",
-		Valid: func(value Any, config Var) bool {
+		Valid: func(value base.Any, config base.Var) bool {
 
 			switch v := value.(type) {
 			case bool:
@@ -170,7 +170,7 @@ func init() {
 
 			return false
 		},
-		Value: func(value Any, config Var) Any {
+		Value: func(value base.Any, config base.Var) base.Any {
 
 			switch v := value.(type) {
 			case bool:
@@ -204,7 +204,7 @@ func init() {
 
 	infra.Register("[bool]", infra.Type{
 		Name: "布尔型数组", Text: "布尔型数组",
-		Valid: func(value Any, config Var) bool {
+		Valid: func(value base.Any, config base.Var) bool {
 
 			switch v := value.(type) {
 			case bool:
@@ -271,7 +271,7 @@ func init() {
 
 			return false
 		},
-		Value: func(value Any, config Var) Any {
+		Value: func(value base.Any, config base.Var) base.Any {
 
 			switch v := value.(type) {
 			case bool:
@@ -353,7 +353,7 @@ func init() {
 
 	infra.Register("int", infra.Type{
 		Name: "整型", Text: "整型",
-		Valid: func(value Any, config Var) bool {
+		Valid: func(value base.Any, config base.Var) bool {
 			switch v := value.(type) {
 			case int, int32, int64, int8, float32, float64:
 				return true
@@ -367,7 +367,7 @@ func init() {
 			}
 			return false
 		},
-		Value: func(value Any, config Var) Any {
+		Value: func(value base.Any, config base.Var) base.Any {
 			switch v := value.(type) {
 			case int:
 				return int64(v)
@@ -398,7 +398,7 @@ func init() {
 
 	infra.Register("[int]", infra.Type{
 		Name: "整型数组", Text: "整型数组",
-		Valid: func(value Any, config Var) bool {
+		Valid: func(value base.Any, config base.Var) bool {
 
 			switch v := value.(type) {
 			case int, int8, int16, int32, int64:
@@ -427,7 +427,7 @@ func init() {
 					}
 					return true
 				}
-			case []Any:
+			case []base.Any:
 				if len(v) > 0 {
 					for _, av := range v {
 						sv := strings.TrimSpace(fmt.Sprintf("%v", av))
@@ -501,7 +501,7 @@ func init() {
 
 			return false
 		},
-		Value: func(value Any, config Var) Any {
+		Value: func(value base.Any, config base.Var) base.Any {
 
 			switch v := value.(type) {
 			case int:
@@ -598,7 +598,7 @@ func init() {
 
 					return arr
 				}
-			case []Any:
+			case []base.Any:
 				{
 					arr := []int64{}
 					for _, av := range v {
@@ -685,7 +685,7 @@ func init() {
 
 	infra.Register("string", infra.Type{
 		Name: "字符串", Text: "字符串",
-		Valid: func(value Any, config Var) bool {
+		Valid: func(value base.Any, config base.Var) bool {
 			switch v := value.(type) {
 			case string:
 				if v != "" {
@@ -704,7 +704,7 @@ func init() {
 			}
 			return false
 		},
-		Value: func(value Any, config Var) Any {
+		Value: func(value base.Any, config base.Var) base.Any {
 			vvv := ""
 			switch v := value.(type) {
 			case string:
@@ -721,12 +721,12 @@ func init() {
 
 	infra.Register("[string]", infra.Type{
 		Name: "字符数组", Text: "字符数组",
-		Valid: func(value Any, config Var) bool {
+		Valid: func(value base.Any, config base.Var) bool {
 			switch value.(type) {
 			case []string:
 				//要不要判断是否为空数组
 				return true
-			case []Any:
+			case []base.Any:
 				//要不要判断是否为空数组
 				return true
 			case string:
@@ -745,7 +745,7 @@ func init() {
 				return false
 			}
 		},
-		Value: func(value Any, config Var) Any {
+		Value: func(value base.Any, config base.Var) base.Any {
 
 			switch v := value.(type) {
 			case []string:
@@ -759,7 +759,7 @@ func init() {
 				}
 
 				return reals
-			case []Any:
+			case []base.Any:
 
 				//去空字串
 				reals := []string{}
@@ -829,7 +829,7 @@ func init() {
 
 	infra.Register("[line]", infra.Type{
 		Name: "字符分行数组", Text: "字符分行数组",
-		Valid: func(value Any, config Var) bool {
+		Valid: func(value base.Any, config base.Var) bool {
 			switch value.(type) {
 			case []string:
 				return true
@@ -839,7 +839,7 @@ func init() {
 				return false
 			}
 		},
-		Value: func(value Any, config Var) Any {
+		Value: func(value base.Any, config base.Var) base.Any {
 
 			switch v := value.(type) {
 			case []string:
@@ -880,7 +880,7 @@ func init() {
 
 	infra.Register("date", infra.Type{
 		Name: "日期时间", Text: "日期时间",
-		Valid: func(value Any, config Var) bool {
+		Valid: func(value base.Any, config base.Var) bool {
 
 			switch v := value.(type) {
 			case time.Time:
@@ -895,7 +895,7 @@ func init() {
 
 			return false
 		},
-		Value: func(value Any, config Var) Any {
+		Value: func(value base.Any, config base.Var) base.Any {
 			switch v := value.(type) {
 			case int64:
 				return time.Unix(v, 0)
@@ -923,7 +923,7 @@ func init() {
 
 	infra.Register("[date]", infra.Type{
 		Name: "日期时间数组", Text: "日期时间数组",
-		Valid: func(value Any, config Var) bool {
+		Valid: func(value base.Any, config base.Var) bool {
 
 			switch v := value.(type) {
 			case []time.Time:
@@ -936,7 +936,7 @@ func init() {
 
 			return false
 		},
-		Value: func(value Any, config Var) Any {
+		Value: func(value base.Any, config base.Var) base.Any {
 			switch v := value.(type) {
 			case []time.Time:
 				return v
@@ -964,7 +964,7 @@ func init() {
 
 	infra.Register("datetime", infra.Type{
 		Name: "日期时间", Text: "日期时间",
-		Valid: func(value Any, config Var) bool {
+		Valid: func(value base.Any, config base.Var) bool {
 
 			switch v := value.(type) {
 			case time.Time:
@@ -977,7 +977,7 @@ func init() {
 
 			return false
 		},
-		Value: func(value Any, config Var) Any {
+		Value: func(value base.Any, config base.Var) base.Any {
 			switch v := value.(type) {
 			case time.Time:
 				return v
@@ -1006,7 +1006,7 @@ func init() {
 
 	infra.Register("[datetime]", infra.Type{
 		Name: "日期时间数组", Text: "日期时间数组",
-		Valid: func(value Any, config Var) bool {
+		Valid: func(value base.Any, config base.Var) bool {
 
 			switch v := value.(type) {
 			case []time.Time:
@@ -1019,7 +1019,7 @@ func init() {
 
 			return false
 		},
-		Value: func(value Any, config Var) Any {
+		Value: func(value base.Any, config base.Var) base.Any {
 			switch v := value.(type) {
 			case []time.Time:
 				return v
@@ -1033,7 +1033,7 @@ func init() {
 
 	infra.Register("timestamp", infra.Type{
 		Name: "时间戳", Text: "时间戳",
-		Valid: func(value Any, config Var) bool {
+		Valid: func(value base.Any, config base.Var) bool {
 
 			switch v := value.(type) {
 			case time.Time:
@@ -1044,7 +1044,7 @@ func init() {
 
 			return false
 		},
-		Value: func(value Any, config Var) Any {
+		Value: func(value base.Any, config base.Var) base.Any {
 			switch v := value.(type) {
 			case time.Time:
 				return v.Unix()
@@ -1063,7 +1063,7 @@ func init() {
 
 	infra.Register("[timestamp]", infra.Type{
 		Name: "时间戳数组", Text: "时间戳数组",
-		Valid: func(value Any, config Var) bool {
+		Valid: func(value base.Any, config base.Var) bool {
 
 			switch v := value.(type) {
 			case time.Time:
@@ -1076,7 +1076,7 @@ func init() {
 
 			return false
 		},
-		Value: func(value Any, config Var) Any {
+		Value: func(value base.Any, config base.Var) base.Any {
 			switch v := value.(type) {
 			case time.Time:
 				return []int64{v.Unix()}
@@ -1108,7 +1108,7 @@ func init() {
 
 	infra.Register("enum", infra.Type{
 		Name: "枚举", Text: "枚举",
-		Valid: func(value Any, config Var) bool {
+		Valid: func(value base.Any, config base.Var) bool {
 
 			sv := fmt.Sprintf("%v", value)
 
@@ -1121,14 +1121,14 @@ func init() {
 			}
 			return false
 		},
-		Value: func(value Any, config Var) Any {
+		Value: func(value base.Any, config base.Var) base.Any {
 			return fmt.Sprintf("%v", value)
 		},
 	})
 
 	infra.Register("[enum]", infra.Type{
 		Name: "枚举数组", Text: "枚举数组",
-		Valid: func(value Any, config Var) bool {
+		Valid: func(value base.Any, config base.Var) bool {
 			vals := []string{}
 			switch v := value.(type) {
 			case string:
@@ -1155,7 +1155,7 @@ func init() {
 				{
 					vals = v
 				}
-			case []Any:
+			case []base.Any:
 				{
 					for _, va := range v {
 						vals = append(vals, fmt.Sprintf("%v", va))
@@ -1191,7 +1191,7 @@ func init() {
 			}
 
 		},
-		Value: func(value Any, config Var) Any {
+		Value: func(value base.Any, config base.Var) base.Any {
 			vals := []string{}
 
 			switch v := value.(type) {
@@ -1221,7 +1221,7 @@ func init() {
 				{
 					vals = v
 				}
-			case []Any:
+			case []base.Any:
 				{
 					for _, va := range v {
 						vals = append(vals, fmt.Sprintf("%v", va))
@@ -1240,19 +1240,19 @@ func init() {
 
 	infra.Register("file", infra.Type{
 		Name: "file", Text: "file",
-		Valid: func(value Any, config Var) bool {
+		Valid: func(value base.Any, config base.Var) bool {
 
 			switch value.(type) {
-			case Map:
+			case base.Map:
 				return true
 			}
 
 			return false
 		},
-		Value: func(value Any, config Var) Any {
+		Value: func(value base.Any, config base.Var) base.Any {
 
 			switch vv := value.(type) {
-			case Map:
+			case base.Map:
 				return vv
 			}
 			return value
@@ -1261,26 +1261,26 @@ func init() {
 
 	infra.Register("[file]", infra.Type{
 		Name: "文件数组", Text: "文件数组",
-		Valid: func(value Any, config Var) bool {
+		Valid: func(value base.Any, config base.Var) bool {
 
 			switch value.(type) {
-			case Map:
+			case base.Map:
 				return true
-			case []Map:
+			case []base.Map:
 				return true
 			}
 
 			return false
 		},
-		Value: func(value Any, config Var) Any {
+		Value: func(value base.Any, config base.Var) base.Any {
 
 			switch v := value.(type) {
-			case Map:
-				return []Map{v}
-			case []Map:
+			case base.Map:
+				return []base.Map{v}
+			case []base.Map:
 				return v
 			}
-			return []Map{}
+			return []base.Map{}
 		},
 	})
 
@@ -1290,7 +1290,7 @@ func init() {
 
 	infra.Register("float", infra.Type{
 		Name: "浮点型", Text: "布尔型",
-		Valid: func(value Any, config Var) bool {
+		Valid: func(value base.Any, config base.Var) bool {
 
 			switch v := value.(type) {
 			case int, int8, int16, int32, int64:
@@ -1311,7 +1311,7 @@ func init() {
 
 			return false
 		},
-		Value: func(value Any, config Var) Any {
+		Value: func(value base.Any, config base.Var) base.Any {
 			switch v := value.(type) {
 			case int:
 				{
@@ -1358,7 +1358,7 @@ func init() {
 
 	infra.Register("[float]", infra.Type{
 		Name: "浮点数组", Text: "浮点数组",
-		Valid: func(value Any, config Var) bool {
+		Valid: func(value base.Any, config base.Var) bool {
 
 			switch v := value.(type) {
 			case int, int8, int16, int32, int64:
@@ -1385,7 +1385,7 @@ func init() {
 					}
 					return true
 				}
-			case []Any:
+			case []base.Any:
 				{
 					if len(v) > 0 {
 						for _, av := range v {
@@ -1440,7 +1440,7 @@ func init() {
 
 			return false
 		},
-		Value: func(value Any, config Var) Any {
+		Value: func(value base.Any, config base.Var) base.Any {
 
 			switch v := value.(type) {
 			case int:
@@ -1531,7 +1531,7 @@ func init() {
 					return arr
 				}
 
-			case []Any:
+			case []base.Any:
 				{
 					arr := []float64{}
 					for _, av := range v {
@@ -1597,139 +1597,139 @@ func init() {
 
 	infra.Register("image", infra.Type{
 		Name: "image", Text: "image",
-		Valid: func(value Any, config Var) bool {
+		Valid: func(value base.Any, config base.Var) bool {
 
 			switch value.(type) {
-			case Map:
+			case base.Map:
 				return true
 			}
 
 			return false
 		},
-		Value: func(value Any, config Var) Any {
+		Value: func(value base.Any, config base.Var) base.Any {
 
 			switch vv := value.(type) {
-			case Map:
+			case base.Map:
 				return vv
 			}
-			return Map{}
+			return base.Map{}
 		},
 	})
 
 	infra.Register("[image]", infra.Type{
 		Name: "image数组", Text: "image数组",
-		Valid: func(value Any, config Var) bool {
+		Valid: func(value base.Any, config base.Var) bool {
 
 			switch value.(type) {
-			case Map:
+			case base.Map:
 				return true
-			case []Map:
+			case []base.Map:
 				return true
 			}
 
 			return false
 		},
-		Value: func(value Any, config Var) Any {
+		Value: func(value base.Any, config base.Var) base.Any {
 
 			switch v := value.(type) {
-			case Map:
-				return []Map{v}
-			case []Map:
+			case base.Map:
+				return []base.Map{v}
+			case []base.Map:
 				return v
 			}
-			return []Map{}
+			return []base.Map{}
 		},
 	})
 
 	infra.Register("audio", infra.Type{
 		Name: "audio", Text: "audio",
-		Valid: func(value Any, config Var) bool {
+		Valid: func(value base.Any, config base.Var) bool {
 
 			switch value.(type) {
-			case Map:
+			case base.Map:
 				return true
 			}
 
 			return false
 		},
-		Value: func(value Any, config Var) Any {
+		Value: func(value base.Any, config base.Var) base.Any {
 
 			switch vv := value.(type) {
-			case Map:
+			case base.Map:
 				return vv
 			}
-			return Map{}
+			return base.Map{}
 		},
 	})
 
 	infra.Register("[audio]", infra.Type{
 		Name: "audio数组", Text: "audio数组",
-		Valid: func(value Any, config Var) bool {
+		Valid: func(value base.Any, config base.Var) bool {
 
 			switch value.(type) {
-			case Map:
+			case base.Map:
 				return true
-			case []Map:
+			case []base.Map:
 				return true
 			}
 
 			return false
 		},
-		Value: func(value Any, config Var) Any {
+		Value: func(value base.Any, config base.Var) base.Any {
 
 			switch v := value.(type) {
-			case Map:
-				return []Map{v}
-			case []Map:
+			case base.Map:
+				return []base.Map{v}
+			case []base.Map:
 				return v
 			}
-			return []Map{}
+			return []base.Map{}
 		},
 	})
 
 	infra.Register("video", infra.Type{
 		Name: "video", Text: "video",
-		Valid: func(value Any, config Var) bool {
+		Valid: func(value base.Any, config base.Var) bool {
 
 			switch value.(type) {
-			case Map:
+			case base.Map:
 				return true
 			}
 
 			return false
 		},
-		Value: func(value Any, config Var) Any {
+		Value: func(value base.Any, config base.Var) base.Any {
 
 			switch vv := value.(type) {
-			case Map:
+			case base.Map:
 				return vv
 			}
-			return Map{}
+			return base.Map{}
 		},
 	})
 
 	infra.Register("[video]", infra.Type{
 		Name: "video数组", Text: "video数组",
-		Valid: func(value Any, config Var) bool {
+		Valid: func(value base.Any, config base.Var) bool {
 
 			switch value.(type) {
-			case Map:
+			case base.Map:
 				return true
-			case []Map:
+			case []base.Map:
 				return true
 			}
 
 			return false
 		},
-		Value: func(value Any, config Var) Any {
+		Value: func(value base.Any, config base.Var) base.Any {
 
 			switch v := value.(type) {
-			case Map:
-				return []Map{v}
-			case []Map:
+			case base.Map:
+				return []base.Map{v}
+			case []base.Map:
 				return v
 			}
-			return []Map{}
+			return []base.Map{}
 		},
 	})
 
@@ -1739,13 +1739,13 @@ func init() {
 
 	infra.Register("json", infra.Type{
 		Name: "JSON", Text: "JSON",
-		Valid: func(value Any, config Var) bool {
+		Valid: func(value base.Any, config base.Var) bool {
 
 			switch v := value.(type) {
-			case Map:
+			case base.Map:
 				return true
 			case string:
-				m := Map{}
+				m := base.Map{}
 				err := infra.UnmarshalJSON([]byte(v), &m)
 				if err == nil {
 					return true
@@ -1754,13 +1754,13 @@ func init() {
 
 			return false
 		},
-		Value: func(value Any, config Var) Any {
+		Value: func(value base.Any, config base.Var) base.Any {
 
 			switch vv := value.(type) {
-			case Map:
+			case base.Map:
 				return vv
 			case string:
-				m := Map{}
+				m := base.Map{}
 				err := infra.UnmarshalJSON([]byte(vv), &m)
 				if err == nil {
 					return m
@@ -1772,17 +1772,17 @@ func init() {
 
 	infra.Register("[json]", infra.Type{
 		Name: "JSON数组", Text: "JSON数组",
-		Valid: func(value Any, config Var) bool {
+		Valid: func(value base.Any, config base.Var) bool {
 
 			switch v := value.(type) {
-			case Map:
+			case base.Map:
 				return true
-			case []Map:
+			case []base.Map:
 				return true
-			case []Any: //而是这个
+			case []base.Any: //而是这个
 				return true
 			case string:
-				m := []Map{}
+				m := []base.Map{}
 				err := infra.UnmarshalJSON([]byte(v), &m)
 				if err == nil {
 					return true
@@ -1791,18 +1791,18 @@ func init() {
 
 			return false
 		},
-		Value: func(value Any, config Var) Any {
+		Value: func(value base.Any, config base.Var) base.Any {
 
 			switch v := value.(type) {
-			case Map:
-				return []Map{v}
-			case []Map:
+			case base.Map:
+				return []base.Map{v}
+			case []base.Map:
 				return v
-			case []Any: //而是这个
-				vvvv := []Map{}
+			case []base.Any: //而是这个
+				vvvv := []base.Map{}
 				for _, m := range v {
-					if mv, ok := m.(Map); ok {
-						mm := Map{}
+					if mv, ok := m.(base.Map); ok {
+						mm := base.Map{}
 						for kkk, vvv := range mv {
 							mm[kkk] = vvv
 						}
@@ -1812,13 +1812,13 @@ func init() {
 				return vvvv
 
 			case string:
-				m := []Map{}
+				m := []base.Map{}
 				err := infra.UnmarshalJSON([]byte(v), &m)
 				if err == nil {
 					return m
 				}
 			}
-			return []Map{}
+			return []base.Map{}
 		},
 	})
 

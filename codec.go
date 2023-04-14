@@ -13,7 +13,7 @@ import (
 	jsoniter "github.com/json-iterator/go"
 	"github.com/speps/go-hashids/v2"
 
-	. "github.com/infrago/base"
+	"github.com/infrago/base"
 	"github.com/infrago/infra"
 
 	"github.com/BurntSushi/toml"
@@ -32,16 +32,16 @@ var (
 func init() {
 
 	gob.Register(time.Now())
-	gob.Register(Map{})
-	gob.Register([]Map{})
-	gob.Register([]Any{})
+	gob.Register(base.Map{})
+	gob.Register([]base.Map{})
+	gob.Register([]base.Any{})
 
 	infra.Register(infra.JSON, infra.Codec{
 		Name: "JSON编解码", Text: "JSON编解码",
-		Encode: func(value Any) (Any, error) {
+		Encode: func(value base.Any) (base.Any, error) {
 			return jsonCoder.Marshal(value)
 		},
-		Decode: func(data Any, value Any) (Any, error) {
+		Decode: func(data base.Any, value base.Any) (base.Any, error) {
 			if bytes, ok := data.([]byte); ok {
 				err := jsonCoder.Unmarshal(bytes, value)
 				if err != nil {
@@ -55,10 +55,10 @@ func init() {
 
 	infra.Register(infra.XML, infra.Codec{
 		Name: "XML编解码", Text: "XML编解码",
-		Encode: func(value Any) (Any, error) {
+		Encode: func(value base.Any) (base.Any, error) {
 			return xml.Marshal(value)
 		},
-		Decode: func(data Any, value Any) (Any, error) {
+		Decode: func(data base.Any, value base.Any) (base.Any, error) {
 			if dataBytes, ok := data.([]byte); ok {
 				err := xml.Unmarshal(dataBytes, value)
 				if err != nil {
@@ -72,7 +72,7 @@ func init() {
 
 	infra.Register(infra.GOB, infra.Codec{
 		Name: "GOB编解码", Text: "GOB编解码",
-		Encode: func(value Any) (Any, error) {
+		Encode: func(value base.Any) (base.Any, error) {
 			var buffer bytes.Buffer
 			encoder := gob.NewEncoder(&buffer)
 			err := encoder.Encode(value)
@@ -81,7 +81,7 @@ func init() {
 			}
 			return buffer.Bytes(), nil
 		},
-		Decode: func(data Any, value Any) (Any, error) {
+		Decode: func(data base.Any, value base.Any) (base.Any, error) {
 			if dataBytes, ok := data.([]byte); ok {
 				buffer := bytes.NewReader(dataBytes)
 				decoder := gob.NewDecoder(buffer)
@@ -98,7 +98,7 @@ func init() {
 
 	infra.Register(infra.TOML, infra.Codec{
 		Name: "toml编解码", Text: "toml编解码",
-		Encode: func(value Any) (Any, error) {
+		Encode: func(value base.Any) (base.Any, error) {
 			var buffer bytes.Buffer
 			encoder := toml.NewEncoder(&buffer)
 			err := encoder.Encode(value)
@@ -107,7 +107,7 @@ func init() {
 			}
 			return buffer.Bytes(), nil
 		},
-		Decode: func(data Any, value Any) (Any, error) {
+		Decode: func(data base.Any, value base.Any) (base.Any, error) {
 			if cont, ok := data.([]byte); ok {
 				_, err := toml.Decode(string(cont), value)
 				if err != nil {
@@ -122,11 +122,11 @@ func init() {
 	infra.Register("base64", infra.Codec{
 		Alias: []string{"base64std"},
 		Name:  "BASE64加解密", Text: "BASE64加解密",
-		Encode: func(value Any) (Any, error) {
+		Encode: func(value base.Any) (base.Any, error) {
 			text := anyToString(value)
 			return base64.StdEncoding.EncodeToString([]byte(text)), nil
 		},
-		Decode: func(data Any, value Any) (Any, error) {
+		Decode: func(data base.Any, value base.Any) (base.Any, error) {
 			text := anyToString(data)
 			bytes, err := base64.URLEncoding.DecodeString(text)
 			if err != nil {
@@ -138,11 +138,11 @@ func init() {
 
 	infra.Register("base64url", infra.Codec{
 		Name: "BASE64url加解密", Text: "BASE64url加解密",
-		Encode: func(value Any) (Any, error) {
+		Encode: func(value base.Any) (base.Any, error) {
 			text := anyToString(value)
 			return base64.StdEncoding.EncodeToString([]byte(text)), nil
 		},
-		Decode: func(data Any, value Any) (Any, error) {
+		Decode: func(data base.Any, value base.Any) (base.Any, error) {
 			text := anyToString(data)
 			bytes, err := base64.URLEncoding.DecodeString(text)
 			if err != nil {
@@ -154,7 +154,7 @@ func init() {
 
 	infra.Register(infra.TEXT, infra.Codec{
 		Name: "文本加密", Text: "文本加密，自定义字符表的base64编码，字典：" + infra.TextAlphabet(),
-		Encode: func(value Any) (Any, error) {
+		Encode: func(value base.Any) (base.Any, error) {
 			var bytes []byte
 			if vvs, ok := value.([]byte); ok {
 				bytes = vvs
@@ -165,7 +165,7 @@ func init() {
 			text := textCoder.EncodeToString(bytes)
 			return text, nil
 		},
-		Decode: func(data Any, value Any) (Any, error) {
+		Decode: func(data base.Any, value base.Any) (base.Any, error) {
 			var text string
 			if vvs, ok := value.(string); ok {
 				text = vvs
@@ -177,7 +177,7 @@ func init() {
 	}, false)
 	infra.Register(infra.TEXTS, infra.Codec{
 		Name: "文本数组加密", Text: "文本数组加密，自定义字符表的base64编码，字典：" + infra.TextAlphabet(),
-		Encode: func(value Any) (Any, error) {
+		Encode: func(value base.Any) (base.Any, error) {
 			text := ""
 			if vvs, ok := value.(string); ok {
 				text = vvs
@@ -188,7 +188,7 @@ func init() {
 			}
 			return textCoder.EncodeToString([]byte(text)), nil
 		},
-		Decode: func(data Any, value Any) (Any, error) {
+		Decode: func(data base.Any, value base.Any) (base.Any, error) {
 			text := anyToString(data)
 			bytes, err := textCoder.DecodeString(text)
 			if err != nil {
@@ -200,7 +200,7 @@ func init() {
 
 	infra.Register(infra.DIGIT, infra.Codec{
 		Name: "数字加密", Text: "数字加密",
-		Encode: func(value Any) (Any, error) {
+		Encode: func(value base.Any) (base.Any, error) {
 			num := int64(0)
 			if vv, ok := value.(int); ok {
 				num = int64(vv)
@@ -217,7 +217,7 @@ func init() {
 			}
 			return digitCoder.EncodeInt64([]int64{num})
 		},
-		Decode: func(data Any, value Any) (Any, error) {
+		Decode: func(data base.Any, value base.Any) (base.Any, error) {
 			text := anyToString(data)
 			digits, err := digitCoder.DecodeInt64WithError(text)
 			if err != nil {
@@ -232,7 +232,7 @@ func init() {
 
 	infra.Register(infra.DIGITS, infra.Codec{
 		Name: "数字数组加密", Text: "数字数组加密",
-		Encode: func(value Any) (Any, error) {
+		Encode: func(value base.Any) (base.Any, error) {
 			nums := []int64{}
 			if vv, ok := value.(int); ok {
 				nums = append(nums, int64(vv))
@@ -257,7 +257,7 @@ func init() {
 			}
 			return digitCoder.EncodeInt64(nums)
 		},
-		Decode: func(data Any, value Any) (Any, error) {
+		Decode: func(data base.Any, value base.Any) (base.Any, error) {
 			text := anyToString(data)
 			return digitCoder.DecodeInt64WithError(text)
 		},

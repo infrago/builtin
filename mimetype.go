@@ -1,12 +1,12 @@
 package builtin
 
 import (
-	. "github.com/infrago/base"
+	"github.com/infrago/base"
 	"github.com/infrago/infra"
 )
 
 func init() {
-	mimes := Map{
+	mimes := base.Map{
 		"text":   "text/explain",
 		"html":   "text/html",
 		"xml":    "application/xml",

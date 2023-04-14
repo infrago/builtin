@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	. "github.com/infrago/base"
+	"github.com/infrago/base"
 	"github.com/infrago/infra"
 	"github.com/infrago/util"
 )
@@ -14,7 +14,7 @@ func password(str string) string {
 	return util.Sha1(str)
 }
 
-func anyToString(val Any) string {
+func anyToString(val base.Any) string {
 	sv := ""
 	switch v := val.(type) {
 	case string:
@@ -25,21 +25,21 @@ func anyToString(val Any) string {
 		sv = strconv.FormatInt(v, 10)
 	case bool:
 		sv = strconv.FormatBool(v)
-	case Map:
+	case base.Map:
 		d, e := infra.MarshalJSON(v)
 		if e == nil {
 			sv = string(d)
 		} else {
 			sv = "{}"
 		}
-	case []Map:
+	case []base.Map:
 		d, e := infra.MarshalJSON(v)
 		if e == nil {
 			sv = string(d)
 		} else {
 			sv = "[]"
 		}
-	case []int, []int8, []int16, []int32, []int64, []float32, []float64, []string, []bool, []Any:
+	case []int, []int8, []int16, []int32, []int64, []float32, []float64, []string, []bool, []base.Any:
 		d, e := infra.MarshalJSON(v)
 		if e == nil {
 			sv = string(d)
