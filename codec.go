@@ -38,8 +38,8 @@ func init() {
 
 	infra.Register(infra.JSON, infra.Codec{
 		Name: "JSON编解码", Text: "JSON编解码",
-		Encode: func(value base.Any) (base.Any, error) {
-			return jsonCoder.Marshal(value)
+		Encode: func(data base.Any) (base.Any, error) {
+			return jsonCoder.Marshal(data)
 		},
 		Decode: func(data base.Any, value base.Any) (base.Any, error) {
 			if bytes, ok := data.([]byte); ok {
@@ -55,8 +55,8 @@ func init() {
 
 	infra.Register(infra.XML, infra.Codec{
 		Name: "XML编解码", Text: "XML编解码",
-		Encode: func(value base.Any) (base.Any, error) {
-			return xml.Marshal(value)
+		Encode: func(data base.Any) (base.Any, error) {
+			return xml.Marshal(data)
 		},
 		Decode: func(data base.Any, value base.Any) (base.Any, error) {
 			if dataBytes, ok := data.([]byte); ok {
@@ -72,10 +72,10 @@ func init() {
 
 	infra.Register(infra.GOB, infra.Codec{
 		Name: "GOB编解码", Text: "GOB编解码",
-		Encode: func(value base.Any) (base.Any, error) {
+		Encode: func(data base.Any) (base.Any, error) {
 			var buffer bytes.Buffer
 			encoder := gob.NewEncoder(&buffer)
-			err := encoder.Encode(value)
+			err := encoder.Encode(data)
 			if err != nil {
 				return nil, err
 			}
@@ -98,10 +98,10 @@ func init() {
 
 	infra.Register(infra.TOML, infra.Codec{
 		Name: "toml编解码", Text: "toml编解码",
-		Encode: func(value base.Any) (base.Any, error) {
+		Encode: func(data base.Any) (base.Any, error) {
 			var buffer bytes.Buffer
 			encoder := toml.NewEncoder(&buffer)
-			err := encoder.Encode(value)
+			err := encoder.Encode(data)
 			if err != nil {
 				return nil, err
 			}
@@ -122,13 +122,13 @@ func init() {
 	infra.Register("base64", infra.Codec{
 		Alias: []string{"base64std"},
 		Name:  "BASE64加解密", Text: "BASE64加解密",
-		Encode: func(value base.Any) (base.Any, error) {
-			text := anyToString(value)
+		Encode: func(data base.Any) (base.Any, error) {
+			text := anyToString(data)
 			return base64.StdEncoding.EncodeToString([]byte(text)), nil
 		},
 		Decode: func(data base.Any, value base.Any) (base.Any, error) {
 			text := anyToString(data)
-			bytes, err := base64.URLEncoding.DecodeString(text)
+			bytes, err := base64.StdEncoding.DecodeString(text)
 			if err != nil {
 				return "", err
 			}
@@ -138,8 +138,8 @@ func init() {
 
 	infra.Register("base64url", infra.Codec{
 		Name: "BASE64url加解密", Text: "BASE64url加解密",
-		Encode: func(value base.Any) (base.Any, error) {
-			text := anyToString(value)
+		Encode: func(data base.Any) (base.Any, error) {
+			text := anyToString(data)
 			return base64.StdEncoding.EncodeToString([]byte(text)), nil
 		},
 		Decode: func(data base.Any, value base.Any) (base.Any, error) {
@@ -152,14 +152,15 @@ func init() {
 		},
 	}, false)
 
+	//统一传入返回字串，不再用[]byte
 	infra.Register(infra.TEXT, infra.Codec{
 		Name: "文本加密", Text: "文本加密，自定义字符表的base64编码，字典：" + infra.TextAlphabet(),
-		Encode: func(value base.Any) (base.Any, error) {
+		Encode: func(data base.Any) (base.Any, error) {
 			var bytes []byte
-			if vvs, ok := value.([]byte); ok {
+			if vvs, ok := data.([]byte); ok {
 				bytes = vvs
 			} else {
-				bytes = []byte(anyToString(value))
+				bytes = []byte(anyToString(data))
 			}
 
 			text := textCoder.EncodeToString(bytes)
@@ -167,24 +168,29 @@ func init() {
 		},
 		Decode: func(data base.Any, value base.Any) (base.Any, error) {
 			var text string
-			if vvs, ok := value.(string); ok {
+			if vvs, ok := data.(string); ok {
 				text = vvs
 			} else {
 				text = anyToString(data)
 			}
-			return textCoder.DecodeString(text)
+			bytes, err := textCoder.DecodeString(text)
+			if err != nil {
+				return nil, err
+			}
+
+			return string(bytes), nil
 		},
 	}, false)
 	infra.Register(infra.TEXTS, infra.Codec{
 		Name: "文本数组加密", Text: "文本数组加密，自定义字符表的base64编码，字典：" + infra.TextAlphabet(),
-		Encode: func(value base.Any) (base.Any, error) {
+		Encode: func(data base.Any) (base.Any, error) {
 			text := ""
-			if vvs, ok := value.(string); ok {
+			if vvs, ok := data.(string); ok {
 				text = vvs
-			} else if vvs, ok := value.([]string); ok {
+			} else if vvs, ok := data.([]string); ok {
 				text = strings.Join(vvs, "\n")
 			} else {
-				text = anyToString(value)
+				text = anyToString(data)
 			}
 			return textCoder.EncodeToString([]byte(text)), nil
 		},
@@ -200,13 +206,13 @@ func init() {
 
 	infra.Register(infra.DIGIT, infra.Codec{
 		Name: "数字加密", Text: "数字加密",
-		Encode: func(value base.Any) (base.Any, error) {
+		Encode: func(data base.Any) (base.Any, error) {
 			num := int64(0)
-			if vv, ok := value.(int); ok {
+			if vv, ok := data.(int); ok {
 				num = int64(vv)
-			} else if vv, ok := value.(int64); ok {
+			} else if vv, ok := data.(int64); ok {
 				num = int64(vv)
-			} else if vv, ok := value.(string); ok {
+			} else if vv, ok := data.(string); ok {
 				if v, e := strconv.ParseInt(vv, 10, 64); e == nil {
 					num = v
 				} else {
@@ -232,21 +238,21 @@ func init() {
 
 	infra.Register(infra.DIGITS, infra.Codec{
 		Name: "数字数组加密", Text: "数字数组加密",
-		Encode: func(value base.Any) (base.Any, error) {
+		Encode: func(data base.Any) (base.Any, error) {
 			nums := []int64{}
-			if vv, ok := value.(int); ok {
+			if vv, ok := data.(int); ok {
 				nums = append(nums, int64(vv))
-			} else if vv, ok := value.(int64); ok {
+			} else if vv, ok := data.(int64); ok {
 				nums = append(nums, vv)
-			} else if vvs, ok := value.([]int); ok {
+			} else if vvs, ok := data.([]int); ok {
 				for _, num := range vvs {
 					nums = append(nums, int64(num))
 				}
-			} else if vvs, ok := value.([]int64); ok {
+			} else if vvs, ok := data.([]int64); ok {
 				for _, num := range vvs {
 					nums = append(nums, num)
 				}
-			} else if vv, ok := value.(string); ok {
+			} else if vv, ok := data.(string); ok {
 				if v, e := strconv.ParseInt(vv, 10, 64); e == nil {
 					nums = append(nums, int64(v))
 				} else {
