@@ -1,4 +1,4 @@
 module github.com/infrago/builtin
 
-go 1.17
+go 1.18
 
