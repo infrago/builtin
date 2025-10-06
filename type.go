@@ -724,6 +724,381 @@ func init() {
 
 	//---------- int end ----------------------------------
 
+	//---------- uint begin ----------------------------------
+
+	infra.Register("uint", infra.Type{
+		Name: "无符号整型", Text: "无符号整型",
+		Valid: func(value base.Any, config base.Var) bool {
+			switch v := value.(type) {
+			case int, int8, int16, int32, int64:
+				return true
+			case uint, uint8, uint16, uint32, uint64:
+				return true
+			case float32, float64:
+				return true
+			case string:
+				{
+					v = strings.TrimSpace(v)
+					if _, e := strconv.ParseInt(v, 10, 64); e == nil {
+						return true
+					}
+				}
+			}
+			return false
+		},
+		Value: func(value base.Any, config base.Var) base.Any {
+			switch v := value.(type) {
+			case int:
+				return uint64(v)
+			case int8:
+				return uint64(v)
+			case int16:
+				return uint64(v)
+			case int32:
+				return uint64(v)
+			case int64:
+				return uint64(v)
+			case uint64:
+				return uint64(v)
+			case uint:
+				return uint64(v)
+			case uint8:
+				return uint64(v)
+			case uint16:
+				return uint64(v)
+			case uint32:
+				return uint64(v)
+			case float32:
+				return uint64(v)
+			case float64:
+				return uint64(v)
+			case string:
+				{
+					v = strings.TrimSpace(v)
+					if i, e := strconv.ParseUint(v, 10, 64); e == nil {
+						return i
+					}
+				}
+			}
+
+			return uint64(0)
+		},
+	})
+
+	infra.Register("[uint]", infra.Type{
+		Name: "整型数组", Text: "整型数组",
+		Valid: func(value base.Any, config base.Var) bool {
+
+			switch v := value.(type) {
+			case int, int8, int16, int32, int64:
+				return true
+			case []int, []int8, []int16, []int32, []int64:
+				return true
+			case uint, uint8, uint16, uint32, uint64:
+				return true
+			case []uint, []uint8, []uint16, []uint32, []uint64:
+				return true
+			case float32, float64:
+				return true
+			case []float32, []float64:
+				return true
+			case []string:
+				{
+					if len(v) > 0 {
+						for _, sv := range v {
+							sv = strings.TrimSpace(sv)
+							if sv != "" {
+								if _, e := strconv.ParseUint(sv, 10, 64); e != nil {
+									return false
+								}
+							}
+						}
+					}
+					return true
+				}
+			case []base.Any:
+				if len(v) > 0 {
+					for _, av := range v {
+						sv := strings.TrimSpace(fmt.Sprintf("%v", av))
+						if sv != "" {
+							if _, e := strconv.ParseUint(sv, 10, 64); e != nil {
+								return false
+							}
+						}
+					}
+				}
+				return true
+			case string:
+				{
+
+					//此为postgresql数组返回的数组格式
+					//{1,2,3,4,5,6,7,8,9}
+					if v == "{}" || v == "[]" {
+						return true
+					} else if (strings.HasPrefix(v, "{") && strings.HasSuffix(v, "}")) ||
+						strings.HasPrefix(v, "[") && strings.HasSuffix(v, "]") {
+
+						//支持以下几种分隔符
+						//"," " " ";"
+						sp := ","
+						if strings.Index(v, ",") >= 0 {
+							sp = ","
+						} else if strings.Index(v, " ") >= 0 {
+							sp = " "
+						} else if strings.Index(v, ";") >= 0 {
+							sp = ";"
+						} else {
+							sp = ","
+						}
+
+						arr := strings.Split(v[1:len(v)-1], sp)
+
+						for _, sv := range arr {
+							sv = strings.TrimSpace(sv)
+							if sv != "" {
+								if _, e := strconv.ParseUint(sv, 10, 64); e != nil {
+									return false
+								}
+							}
+						}
+
+						return true
+						/*
+								//不再使用json解析，因为json解析大数字，18位数时，会有精度问题
+							} else if strings.HasPrefix(v, "[") && strings.HasSuffix(v, "]") {
+								jv := []interface{}{}
+								e := infra.UnmarshalJSON([]byte(v), &jv)
+								if e == nil {
+									return true
+								} else {
+									return false
+								}*/
+					} else {
+
+						v = strings.TrimSpace(v)
+						if _, e := strconv.ParseInt(v, 10, 64); e == nil {
+							return true
+						} else {
+							return false
+						}
+					}
+
+				}
+
+			default:
+			}
+
+			return false
+		},
+		Value: func(value base.Any, config base.Var) base.Any {
+
+			switch v := value.(type) {
+			case int:
+				return []uint64{uint64(v)}
+			case int8:
+				return []uint64{uint64(v)}
+			case int16:
+				return []uint64{uint64(v)}
+			case int32:
+				return []uint64{uint64(v)}
+			case int64:
+				return []uint64{uint64(v)}
+			case []int:
+				{
+					arr := []uint64{}
+					for _, iv := range v {
+						arr = append(arr, uint64(iv))
+					}
+					return arr
+				}
+			case []int8:
+				{
+					arr := []uint64{}
+					for _, iv := range v {
+						arr = append(arr, uint64(iv))
+					}
+					return arr
+				}
+			case []int16:
+				{
+					arr := []uint64{}
+					for _, iv := range v {
+						arr = append(arr, uint64(iv))
+					}
+					return arr
+				}
+			case []int32:
+				{
+					arr := []uint64{}
+					for _, iv := range v {
+						arr = append(arr, uint64(iv))
+					}
+					return arr
+				}
+			case []int64:
+				{
+					arr := []uint64{}
+					for _, iv := range v {
+						arr = append(arr, uint64(iv))
+					}
+					return arr
+				}
+			case uint:
+				return []uint64{uint64(v)}
+			case uint8:
+				return []uint64{uint64(v)}
+			case uint16:
+				return []uint64{uint64(v)}
+			case uint32:
+				return []uint64{uint64(v)}
+			case uint64:
+				return []uint64{uint64(v)}
+			case []uint:
+				{
+					arr := []uint64{}
+					for _, iv := range v {
+						arr = append(arr, uint64(iv))
+					}
+					return arr
+				}
+			case []uint8:
+				{
+					arr := []uint64{}
+					for _, iv := range v {
+						arr = append(arr, uint64(iv))
+					}
+					return arr
+				}
+			case []uint16:
+				{
+					arr := []uint64{}
+					for _, iv := range v {
+						arr = append(arr, uint64(iv))
+					}
+					return arr
+				}
+			case []uint32:
+				{
+					arr := []uint64{}
+					for _, iv := range v {
+						arr = append(arr, uint64(iv))
+					}
+					return arr
+				}
+			case []uint64:
+				return v
+			case float32:
+				return []uint64{uint64(v)}
+			case float64:
+				return []uint64{uint64(v)}
+			case []float32:
+				arr := []uint64{}
+				for _, iv := range v {
+					arr = append(arr, uint64(iv))
+				}
+				return arr
+			case []float64:
+				arr := []uint64{}
+				for _, iv := range v {
+					arr = append(arr, uint64(iv))
+				}
+			case []string:
+				{
+					arr := []uint64{}
+					for _, sv := range v {
+						sv = strings.TrimSpace(sv)
+						if sv != "" {
+							if iv, e := strconv.ParseUint(sv, 10, 64); e == nil {
+								arr = append(arr, iv)
+							}
+						}
+					}
+
+					return arr
+				}
+			case []base.Any:
+				{
+					arr := []int64{}
+					for _, av := range v {
+						sv := strings.TrimSpace(fmt.Sprintf("%v", av))
+						if sv != "" {
+							if iv, e := strconv.ParseUint(sv, 10, 64); e == nil {
+								arr = append(arr, int64(iv))
+							}
+						}
+					}
+
+					return arr
+				}
+			case string:
+				{
+					if v == "{}" || v == "[]" {
+						return []int64{}
+					} else if (strings.HasPrefix(v, "{") && strings.HasSuffix(v, "}")) ||
+						(strings.HasPrefix(v, "[") && strings.HasSuffix(v, "]")) {
+
+						//支持以下几种分隔符
+						//"," " " ";"
+						sp := ","
+						if strings.Index(v, ",") >= 0 {
+							sp = ","
+						} else if strings.Index(v, " ") >= 0 {
+							sp = " "
+						} else if strings.Index(v, ";") >= 0 {
+							sp = ";"
+						} else {
+							sp = ","
+						}
+
+						arr := []uint64{}
+						strArr := strings.Split(v[1:len(v)-1], sp)
+						for _, sv := range strArr {
+							sv = strings.TrimSpace(sv)
+							if sv != "" {
+								if iv, e := strconv.ParseUint(sv, 10, 64); e == nil {
+									arr = append(arr, iv)
+								}
+							}
+						}
+						return arr
+						/*
+								//不再使用json转换，因为json的float在大数字18位长的时候，会有精度问题，
+							} else if strings.HasPrefix(v, "[") && strings.HasSuffix(v, "]") {
+								jv := []interface{}{}
+								e := infra.UnmarshalJSON([]byte(v), &jv)
+
+								if e == nil {
+
+									arr := []int64{}
+									//所以符合的类型,才写入数组
+									//json回转,所有的数都是float64
+									for _,anyVal := range jv {
+										if newVal,ok := anyVal.(float64); ok {
+											arr = append(arr, int64(newVal))
+										}
+									}
+
+									return arr
+								}
+						*/
+					} else {
+
+						v = strings.TrimSpace(v)
+						if vvv, e := strconv.ParseUint(v, 10, 64); e == nil {
+							return []uint64{vvv}
+						}
+					}
+
+				}
+			default:
+			}
+
+			return []uint64{}
+		},
+	})
+
+	//---------- int end ----------------------------------
+
 	//---------- string begin ----------------------------------
 
 	infra.Register("string", infra.Type{
