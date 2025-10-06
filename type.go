@@ -355,7 +355,11 @@ func init() {
 		Name: "整型", Text: "整型",
 		Valid: func(value base.Any, config base.Var) bool {
 			switch v := value.(type) {
-			case int, int32, int64, int8, float32, float64:
+			case int, int8, int16, int32, int64:
+				return true
+			case uint, uint8, uint16, uint32, uint64:
+				return true
+			case float32, float64:
 				return true
 			case string:
 				{
@@ -378,6 +382,16 @@ func init() {
 			case int32:
 				return int64(v)
 			case int64:
+				return int64(v)
+			case uint64:
+				return int64(v)
+			case uint:
+				return int64(v)
+			case uint8:
+				return int64(v)
+			case uint16:
+				return int64(v)
+			case uint32:
 				return int64(v)
 			case float32:
 				return int64(v)
@@ -402,13 +416,13 @@ func init() {
 
 			switch v := value.(type) {
 			case int, int8, int16, int32, int64:
-				{
-					return true
-				}
+				return true
 			case []int, []int8, []int16, []int32, []int64:
-				{
-					return true
-				}
+				return true
+			case uint, uint8, uint16, uint32, uint64:
+				return true
+			case []uint, []uint8, []uint16, []uint32, []uint64:
+				return true
 			case float32, float64:
 				return true
 			case []float32, []float64:
@@ -505,26 +519,15 @@ func init() {
 
 			switch v := value.(type) {
 			case int:
-				{
-					return []int64{int64(v)}
-				}
+				return []int64{int64(v)}
 			case int8:
-				{
-					return []int64{int64(v)}
-				}
+				return []int64{int64(v)}
 			case int16:
-				{
-					return []int64{int64(v)}
-				}
+				return []int64{int64(v)}
 			case int32:
-				{
-					return []int64{int64(v)}
-				}
+				return []int64{int64(v)}
 			case int64:
-				{
-					return []int64{int64(v)}
-				}
-
+				return []int64{v}
 			case []int:
 				{
 					arr := []int64{}
@@ -558,6 +561,18 @@ func init() {
 					return arr
 				}
 			case []int64:
+				return v
+			case uint:
+				return []int64{int64(v)}
+			case uint8:
+				return []int64{int64(v)}
+			case uint16:
+				return []int64{int64(v)}
+			case uint32:
+				return []int64{int64(v)}
+			case uint64:
+				return []int64{int64(v)}
+			case []uint:
 				{
 					arr := []int64{}
 					for _, iv := range v {
@@ -565,12 +580,42 @@ func init() {
 					}
 					return arr
 				}
-
+			case []uint8:
+				{
+					arr := []int64{}
+					for _, iv := range v {
+						arr = append(arr, int64(iv))
+					}
+					return arr
+				}
+			case []uint16:
+				{
+					arr := []int64{}
+					for _, iv := range v {
+						arr = append(arr, int64(iv))
+					}
+					return arr
+				}
+			case []uint32:
+				{
+					arr := []int64{}
+					for _, iv := range v {
+						arr = append(arr, int64(iv))
+					}
+					return arr
+				}
+			case []uint64:
+				{
+					arr := []int64{}
+					for _, iv := range v {
+						arr = append(arr, int64(iv))
+					}
+					return arr
+				}
 			case float32:
 				return []int64{int64(v)}
 			case float64:
 				return []int64{int64(v)}
-
 			case []float32:
 				arr := []int64{}
 				for _, iv := range v {
@@ -582,8 +627,6 @@ func init() {
 				for _, iv := range v {
 					arr = append(arr, int64(iv))
 				}
-				return arr
-
 			case []string:
 				{
 					arr := []int64{}
@@ -1289,14 +1332,14 @@ func init() {
 	//---------- float begin ----------------------------------
 
 	infra.Register("float", infra.Type{
-		Name: "浮点型", Text: "布尔型",
+		Name: "浮点型", Text: "浮点型",
 		Valid: func(value base.Any, config base.Var) bool {
 
 			switch v := value.(type) {
 			case int, int8, int16, int32, int64:
-				{
-					return true
-				}
+				return true
+			case uint, uint8, uint16, uint32, uint64:
+				return true
 			case float32, float64:
 				{
 					return true
@@ -1314,29 +1357,29 @@ func init() {
 		Value: func(value base.Any, config base.Var) base.Any {
 			switch v := value.(type) {
 			case int:
-				{
-					return float64(v)
-				}
-			case int32:
-				{
-					return float64(v)
-				}
-			case int64:
-				{
-					return float64(v)
-				}
+				return float64(v)
 			case int8:
-				{
-					return float64(v)
-				}
+				return float64(v)
+			case int16:
+				return float64(v)
+			case int32:
+				return float64(v)
+			case int64:
+				return float64(v)
+			case uint:
+				return float64(v)
+			case uint8:
+				return float64(v)
+			case uint16:
+				return float64(v)
+			case uint32:
+				return float64(v)
+			case uint64:
+				return float64(v)
 			case float32:
-				{
-					return float64(v)
-				}
+				return float64(v)
 			case float64:
-				{
-					return v
-				}
+				return v
 			case string:
 				{
 					v = strings.TrimSpace(v)
@@ -1362,13 +1405,11 @@ func init() {
 
 			switch v := value.(type) {
 			case int, int8, int16, int32, int64:
-				{
-					return true
-				}
+				return true
+			case uint, uint8, uint16, uint32, uint64:
+				return true
 			case []int, []int8, []int16, []int32, []int64:
-				{
-					return true
-				}
+				return true
 			case float32, float64:
 				return true
 			case []float32, []float64:
@@ -1444,26 +1485,25 @@ func init() {
 
 			switch v := value.(type) {
 			case int:
-				{
-					return []float64{float64(v)}
-				}
+				return []float64{float64(v)}
 			case int8:
-				{
-					return []float64{float64(v)}
-				}
+				return []float64{float64(v)}
 			case int16:
-				{
-					return []float64{float64(v)}
-				}
+				return []float64{float64(v)}
 			case int32:
-				{
-					return []float64{float64(v)}
-				}
+				return []float64{float64(v)}
 			case int64:
-				{
-					return []float64{float64(v)}
-				}
-
+				return []float64{float64(v)}
+			case uint:
+				return []float64{float64(v)}
+			case uint8:
+				return []float64{float64(v)}
+			case uint16:
+				return []float64{float64(v)}
+			case uint32:
+				return []float64{float64(v)}
+			case uint64:
+				return []float64{float64(v)}
 			case []int:
 				{
 					arr := []float64{}
@@ -1504,18 +1544,58 @@ func init() {
 					}
 					return arr
 				}
-
+			case []uint:
+				{
+					arr := []float64{}
+					for _, iv := range v {
+						arr = append(arr, float64(iv))
+					}
+					return arr
+				}
+			case []uint8:
+				{
+					arr := []float64{}
+					for _, iv := range v {
+						arr = append(arr, float64(iv))
+					}
+					return arr
+				}
+			case []uint16:
+				{
+					arr := []float64{}
+					for _, iv := range v {
+						arr = append(arr, float64(iv))
+					}
+					return arr
+				}
+			case []uint32:
+				{
+					arr := []float64{}
+					for _, iv := range v {
+						arr = append(arr, float64(iv))
+					}
+					return arr
+				}
+			case []uint64:
+				{
+					arr := []float64{}
+					for _, iv := range v {
+						arr = append(arr, float64(iv))
+					}
+					return arr
+				}
 			case float32:
 				return []float64{float64(v)}
 			case float64:
-				return []float64{float64(v)}
-
+				return []float64{v}
 			case []float32:
-				arr := []float64{}
-				for _, iv := range v {
-					arr = append(arr, float64(iv))
+				{
+					arr := []float64{}
+					for _, iv := range v {
+						arr = append(arr, float64(iv))
+					}
+					return arr
 				}
-				return arr
 			case []float64:
 				return v
 
@@ -1544,7 +1624,6 @@ func init() {
 				}
 			case string:
 				{
-
 					if v == "{}" || v == "[]" {
 						return []float64{}
 					} else if strings.HasPrefix(v, "{") && strings.HasSuffix(v, "}") {
