@@ -1,2 +1,2 @@
 # builtin
-bamgoo builtin.
+infrago builtin.

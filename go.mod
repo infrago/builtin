@@ -1,3 +1,3 @@
-module github.com/bamgoo/builtin
+module github.com/infrago/builtin
 
 go 1.25.3
