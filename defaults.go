@@ -22,10 +22,11 @@ import (
 )
 
 func init() {
-	infra.Mount(builtin)
+	builtinHost = infra.Mount(builtin)
 }
 
 var builtin = &builtinModule{}
+var builtinHost infra.Host
 
 var errInvalidCodecData = errors.New("Invalid codec data.")
 
@@ -78,8 +79,28 @@ func (m *builtinModule) Setup() {
 	m.loaded = true
 }
 
+func registerBuiltin(args ...Any) {
+	name := ""
+	values := make([]Any, 0, len(args))
+	for _, arg := range args {
+		switch v := arg.(type) {
+		case string:
+			name = v
+		default:
+			values = append(values, v)
+		}
+	}
+	for _, value := range values {
+		if builtinHost != nil {
+			builtinHost.RegisterLocal(name, value)
+			continue
+		}
+		infra.Register(name, value)
+	}
+}
+
 func registerBuiltinCodecs() {
-	infra.RegisterCodec(JSON, Codec{
+	registerBuiltin(JSON, Codec{
 		Encode: func(v Any) (Any, error) {
 			if bts, ok := v.([]byte); ok {
 				return bts, nil
@@ -98,7 +119,7 @@ func registerBuiltinCodecs() {
 			return out, json.Unmarshal(data, &out)
 		},
 	})
-	infra.RegisterCodec(XML, Codec{
+	registerBuiltin(XML, Codec{
 		Encode: func(v Any) (Any, error) {
 			if bts, ok := v.([]byte); ok {
 				return bts, nil
@@ -117,7 +138,7 @@ func registerBuiltinCodecs() {
 			return out, xml.Unmarshal(data, &out)
 		},
 	})
-	infra.RegisterCodec(GOB, Codec{
+	registerBuiltin(GOB, Codec{
 		Encode: func(v Any) (Any, error) {
 			if bts, ok := v.([]byte); ok {
 				return bts, nil
@@ -142,7 +163,7 @@ func registerBuiltinCodecs() {
 			return v, dec.Decode(v)
 		},
 	})
-	infra.RegisterCodec(TOML, Codec{
+	registerBuiltin(TOML, Codec{
 		Encode: func(v Any) (Any, error) {
 			if bts, ok := v.([]byte); ok {
 				return bts, nil
@@ -161,7 +182,7 @@ func registerBuiltinCodecs() {
 			return out, toml.Unmarshal(data, &out)
 		},
 	})
-	infra.RegisterCodec(DIGIT, Codec{
+	registerBuiltin(DIGIT, Codec{
 		Encode: func(v Any) (Any, error) {
 			n, ok := builtinToInt64(v)
 			if !ok {
@@ -177,7 +198,7 @@ func registerBuiltinCodecs() {
 			return infra.DecodeInt64(s)
 		},
 	})
-	infra.RegisterCodec(DIGITS, Codec{
+	registerBuiltin(DIGITS, Codec{
 		Encode: func(v Any) (Any, error) {
 			arr, err := builtinCodecToInt64Slice(v)
 			if err != nil {
@@ -193,7 +214,7 @@ func registerBuiltinCodecs() {
 			return infra.DecodeInt64Slice(s)
 		},
 	})
-	infra.RegisterCodec(TEXT, Codec{
+	registerBuiltin(TEXT, Codec{
 		Encode: func(v Any) (Any, error) {
 			var data []byte
 			switch vv := v.(type) {
@@ -225,7 +246,7 @@ func registerBuiltinCodecs() {
 			return data, nil
 		},
 	})
-	infra.RegisterCodec(TEXTS, Codec{
+	registerBuiltin(TEXTS, Codec{
 		Encode: func(v Any) (Any, error) {
 			arr := builtinToStringSlice(v)
 			bts, err := json.Marshal(arr)
@@ -251,7 +272,7 @@ func registerBuiltinCodecs() {
 		},
 	})
 
-	infra.RegisterCodec("base64", Codec{
+	registerBuiltin("base64", Codec{
 		Alias: []string{"base64std"},
 		Encode: func(v Any) (Any, error) {
 			return base64.StdEncoding.EncodeToString([]byte(builtinToText(v))), nil
@@ -265,7 +286,7 @@ func registerBuiltinCodecs() {
 		},
 	})
 
-	infra.RegisterCodec("base64url", Codec{
+	registerBuiltin("base64url", Codec{
 		Encode: func(v Any) (Any, error) {
 			return base64.URLEncoding.EncodeToString([]byte(builtinToText(v))), nil
 		},
@@ -327,7 +348,7 @@ func builtinCodecToInt64Slice(v Any) ([]int64, error) {
 }
 
 func registerBuiltinMimes() {
-	infra.RegisterMimes(Mimes{
+	registerBuiltin(Mimes{
 		"text":   {"text/plain"},
 		"html":   {"text/html"},
 		"xml":    {"application/xml"},
@@ -383,7 +404,7 @@ func registerBuiltinMimes() {
 }
 
 func registerBuiltinRegulars() {
-	infra.RegisterRegulars(Regulars{
+	registerBuiltin(Regulars{
 		"password": {`^[0-9A-Fa-f]{40}$`},
 		"number":   {`^[0-9]+$`},
 		"float":    {`^[+-]?([0-9]+(\.[0-9]+)?|\.[0-9]+)$`},
@@ -408,7 +429,7 @@ func registerBuiltinRegulars() {
 
 func registerBuiltinTypes() {
 	// password
-	infra.RegisterType("password", Type{
+	registerBuiltin("password", Type{
 		Name: "password",
 		Valid: func(value Any, config Var) bool {
 			return builtinToText(value) != ""
@@ -424,13 +445,13 @@ func registerBuiltinTypes() {
 	})
 
 	// any/map
-	infra.RegisterType("any", Type{
+	registerBuiltin("any", Type{
 		Name:  "any",
 		Alias: []string{"*"},
 		Valid: func(value Any, config Var) bool { return true },
 		Value: func(value Any, config Var) Any { return value },
 	})
-	infra.RegisterType("[any]", Type{
+	registerBuiltin("[any]", Type{
 		Name:  "[any]",
 		Alias: []string{"anys"},
 		Valid: func(value Any, config Var) bool { return true },
@@ -450,7 +471,7 @@ func registerBuiltinTypes() {
 		},
 	})
 
-	infra.RegisterType("map", Type{
+	registerBuiltin("map", Type{
 		Name:  "map",
 		Alias: []string{"object", "dict"},
 		Valid: func(value Any, config Var) bool {
@@ -472,7 +493,7 @@ func registerBuiltinTypes() {
 			return Map{}
 		},
 	})
-	infra.RegisterType("[map]", Type{
+	registerBuiltin("[map]", Type{
 		Name:  "[map]",
 		Alias: []string{"array_map", "maps"},
 		Valid: func(value Any, config Var) bool {
@@ -494,7 +515,7 @@ func registerBuiltinTypes() {
 	})
 
 	// bool
-	infra.RegisterType("bool", Type{
+	registerBuiltin("bool", Type{
 		Name: "bool",
 		Valid: func(value Any, config Var) bool {
 			_, ok := builtinToBool(value)
@@ -505,7 +526,7 @@ func registerBuiltinTypes() {
 			return val
 		},
 	})
-	infra.RegisterType("[bool]", Type{
+	registerBuiltin("[bool]", Type{
 		Name: "[bool]",
 		Valid: func(value Any, config Var) bool {
 			switch v := value.(type) {
@@ -557,7 +578,7 @@ func registerBuiltinTypes() {
 }
 
 func registerIntTypes() {
-	infra.RegisterType("int", Type{
+	registerBuiltin("int", Type{
 		Name:  "int",
 		Alias: []string{"integer", "int32", "int64", "bigint"},
 		Valid: func(value Any, config Var) bool {
@@ -569,7 +590,7 @@ func registerIntTypes() {
 			return int(v)
 		},
 	})
-	infra.RegisterType("[int]", Type{
+	registerBuiltin("[int]", Type{
 		Name:  "[int]",
 		Alias: []string{"array_int", "array_integer", "array_int64", "ints"},
 		Valid: func(value Any, config Var) bool {
@@ -608,7 +629,7 @@ func registerIntTypes() {
 }
 
 func registerUintTypes() {
-	infra.RegisterType("uint", Type{
+	registerBuiltin("uint", Type{
 		Name:  "uint",
 		Alias: []string{"uint32", "uint64"},
 		Valid: func(value Any, config Var) bool {
@@ -623,7 +644,7 @@ func registerUintTypes() {
 			return uint(n)
 		},
 	})
-	infra.RegisterType("[uint]", Type{
+	registerBuiltin("[uint]", Type{
 		Name:  "[uint]",
 		Alias: []string{"array_uint", "array_uint64", "uints", "units"},
 		Valid: func(value Any, config Var) bool {
@@ -669,7 +690,7 @@ func registerUintTypes() {
 }
 
 func registerFloatTypes() {
-	infra.RegisterType("float", Type{
+	registerBuiltin("float", Type{
 		Name:  "float",
 		Alias: []string{"number", "double", "decimal"},
 		Valid: func(value Any, config Var) bool {
@@ -681,7 +702,7 @@ func registerFloatTypes() {
 			return n
 		},
 	})
-	infra.RegisterType("[float]", Type{
+	registerBuiltin("[float]", Type{
 		Name:  "[float]",
 		Alias: []string{"array_float", "array_number", "array_double", "floats"},
 		Valid: func(value Any, config Var) bool {
@@ -720,7 +741,7 @@ func registerFloatTypes() {
 }
 
 func registerStringTypes() {
-	infra.RegisterType("string", Type{
+	registerBuiltin("string", Type{
 		Name:  "string",
 		Alias: []string{"text"},
 		Valid: func(value Any, config Var) bool { return true },
@@ -728,7 +749,7 @@ func registerStringTypes() {
 			return builtinToText(value)
 		},
 	})
-	infra.RegisterType("[string]", Type{
+	registerBuiltin("[string]", Type{
 		Name:  "[string]",
 		Alias: []string{"array_string", "strings", "texts"},
 		Valid: func(value Any, config Var) bool { return true },
@@ -736,7 +757,7 @@ func registerStringTypes() {
 			return builtinToStringSlice(value)
 		},
 	})
-	infra.RegisterType("[line]", Type{
+	registerBuiltin("[line]", Type{
 		Name:  "[line]",
 		Valid: func(value Any, config Var) bool { return true },
 		Value: func(value Any, config Var) Any {
@@ -754,7 +775,7 @@ func registerStringTypes() {
 }
 
 func registerTimeTypes() {
-	infra.RegisterType("date", Type{
+	registerBuiltin("date", Type{
 		Name: "date",
 		Valid: func(value Any, config Var) bool {
 			_, ok := builtinParseDate(value)
@@ -766,7 +787,7 @@ func registerTimeTypes() {
 			return time.Date(y, m, d, 0, 0, 0, 0, t.Location())
 		},
 	})
-	infra.RegisterType("[date]", Type{
+	registerBuiltin("[date]", Type{
 		Name: "[date]",
 		Valid: func(value Any, config Var) bool {
 			for _, one := range builtinToSlice(value) {
@@ -788,7 +809,7 @@ func registerTimeTypes() {
 		},
 	})
 
-	infra.RegisterType("datetime", Type{
+	registerBuiltin("datetime", Type{
 		Name: "datetime",
 		Valid: func(value Any, config Var) bool {
 			_, ok := builtinParseDateTime(value)
@@ -799,7 +820,7 @@ func registerTimeTypes() {
 			return t
 		},
 	})
-	infra.RegisterType("[datetime]", Type{
+	registerBuiltin("[datetime]", Type{
 		Name: "[datetime]",
 		Valid: func(value Any, config Var) bool {
 			for _, one := range builtinToSlice(value) {
@@ -820,7 +841,7 @@ func registerTimeTypes() {
 		},
 	})
 
-	infra.RegisterType("timestamp", Type{
+	registerBuiltin("timestamp", Type{
 		Name: "timestamp",
 		Valid: func(value Any, config Var) bool {
 			_, ok := builtinToInt64(value)
@@ -838,7 +859,7 @@ func registerTimeTypes() {
 			return t.Unix()
 		},
 	})
-	infra.RegisterType("[timestamp]", Type{
+	registerBuiltin("[timestamp]", Type{
 		Name: "[timestamp]",
 		Valid: func(value Any, config Var) bool {
 			for _, one := range builtinToSlice(value) {
@@ -889,7 +910,7 @@ func registerEnumTypes() {
 		return out
 	}
 
-	infra.RegisterType("enum", Type{
+	registerBuiltin("enum", Type{
 		Name: "enum",
 		Valid: func(value Any, config Var) bool {
 			allowed := enumValues(config)
@@ -903,7 +924,7 @@ func registerEnumTypes() {
 			return builtinToText(value)
 		},
 	})
-	infra.RegisterType("[enum]", Type{
+	registerBuiltin("[enum]", Type{
 		Name: "[enum]",
 		Valid: func(value Any, config Var) bool {
 			allowed := enumValues(config)
@@ -926,7 +947,7 @@ func registerEnumTypes() {
 func registerPassThroughTypes() {
 	for _, name := range []string{"file", "image", "audio", "video"} {
 		typeName := name
-		infra.RegisterType(typeName, Type{
+		registerBuiltin(typeName, Type{
 			Name: typeName,
 			Valid: func(value Any, config Var) bool {
 				return value != nil
@@ -935,7 +956,7 @@ func registerPassThroughTypes() {
 				return value
 			},
 		})
-		infra.RegisterType("["+typeName+"]", Type{
+		registerBuiltin("["+typeName+"]", Type{
 			Name: "[" + typeName + "]",
 			Valid: func(value Any, config Var) bool {
 				return value != nil
@@ -946,7 +967,7 @@ func registerPassThroughTypes() {
 		})
 	}
 
-	infra.RegisterType("json", Type{
+	registerBuiltin("json", Type{
 		Name:  "json",
 		Alias: []string{"jsonb"},
 		Valid: func(value Any, config Var) bool {
@@ -977,7 +998,7 @@ func registerPassThroughTypes() {
 			return value
 		},
 	})
-	infra.RegisterType("[json]", Type{
+	registerBuiltin("[json]", Type{
 		Name:  "[json]",
 		Alias: []string{"array_json", "jsons", "jsonbs"},
 		Valid: func(value Any, config Var) bool {
@@ -1001,7 +1022,7 @@ func registerPassThroughTypes() {
 }
 
 func registerDBTypes() {
-	infra.RegisterType("uuid", Type{
+	registerBuiltin("uuid", Type{
 		Name: "uuid",
 		Valid: func(value Any, config Var) bool {
 			return builtinIsUUID(builtinToText(value))
@@ -1010,7 +1031,7 @@ func registerDBTypes() {
 			return strings.ToLower(strings.TrimSpace(builtinToText(value)))
 		},
 	})
-	infra.RegisterType("[uuid]", Type{
+	registerBuiltin("[uuid]", Type{
 		Name: "[uuid]",
 		Valid: func(value Any, config Var) bool {
 			for _, one := range builtinToSlice(value) {
@@ -1029,7 +1050,7 @@ func registerDBTypes() {
 		},
 	})
 
-	infra.RegisterType("inet", Type{
+	registerBuiltin("inet", Type{
 		Name: "inet",
 		Valid: func(value Any, config Var) bool {
 			return net.ParseIP(strings.TrimSpace(builtinToText(value))) != nil
@@ -1038,7 +1059,7 @@ func registerDBTypes() {
 			return strings.TrimSpace(builtinToText(value))
 		},
 	})
-	infra.RegisterType("[inet]", Type{
+	registerBuiltin("[inet]", Type{
 		Name: "[inet]",
 		Valid: func(value Any, config Var) bool {
 			for _, one := range builtinToSlice(value) {
@@ -1057,7 +1078,7 @@ func registerDBTypes() {
 		},
 	})
 
-	infra.RegisterType("cidr", Type{
+	registerBuiltin("cidr", Type{
 		Name: "cidr",
 		Valid: func(value Any, config Var) bool {
 			_, _, err := net.ParseCIDR(strings.TrimSpace(builtinToText(value)))
@@ -1067,7 +1088,7 @@ func registerDBTypes() {
 			return strings.TrimSpace(builtinToText(value))
 		},
 	})
-	infra.RegisterType("[cidr]", Type{
+	registerBuiltin("[cidr]", Type{
 		Name: "[cidr]",
 		Valid: func(value Any, config Var) bool {
 			for _, one := range builtinToSlice(value) {
@@ -1087,7 +1108,7 @@ func registerDBTypes() {
 		},
 	})
 
-	infra.RegisterType("macaddr", Type{
+	registerBuiltin("macaddr", Type{
 		Name: "macaddr",
 		Valid: func(value Any, config Var) bool {
 			_, err := net.ParseMAC(strings.TrimSpace(builtinToText(value)))
@@ -1101,7 +1122,7 @@ func registerDBTypes() {
 			return strings.ToLower(text)
 		},
 	})
-	infra.RegisterType("[macaddr]", Type{
+	registerBuiltin("[macaddr]", Type{
 		Name: "[macaddr]",
 		Valid: func(value Any, config Var) bool {
 			for _, one := range builtinToSlice(value) {
@@ -1126,7 +1147,7 @@ func registerDBTypes() {
 		},
 	})
 
-	infra.RegisterType("decimal128", Type{
+	registerBuiltin("decimal128", Type{
 		Name: "decimal128",
 		Valid: func(value Any, config Var) bool {
 			_, ok := builtinParseDecimal(value)
@@ -1139,7 +1160,7 @@ func registerDBTypes() {
 			return builtinToText(value)
 		},
 	})
-	infra.RegisterType("[decimal128]", Type{
+	registerBuiltin("[decimal128]", Type{
 		Name: "[decimal128]",
 		Valid: func(value Any, config Var) bool {
 			for _, one := range builtinToSlice(value) {
