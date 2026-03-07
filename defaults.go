@@ -587,7 +587,7 @@ func registerIntTypes() {
 		},
 		Value: func(value Any, config Var) Any {
 			v, _ := builtinToInt64(value)
-			return int(v)
+			return v
 		},
 	})
 	registerBuiltin("[int]", Type{
@@ -595,7 +595,7 @@ func registerIntTypes() {
 		Alias: []string{"array_int", "array_integer", "array_int64", "ints"},
 		Valid: func(value Any, config Var) bool {
 			switch v := value.(type) {
-			case []int:
+			case []int, []int64:
 				return true
 			case []Any:
 				for _, one := range v {
@@ -611,18 +611,24 @@ func registerIntTypes() {
 		},
 		Value: func(value Any, config Var) Any {
 			switch v := value.(type) {
-			case []int:
+			case []int64:
 				return v
+			case []int:
+				out := make([]int64, 0, len(v))
+				for _, one := range v {
+					out = append(out, int64(one))
+				}
+				return out
 			case []Any:
-				out := make([]int, 0, len(v))
+				out := make([]int64, 0, len(v))
 				for _, one := range v {
 					n, _ := builtinToInt64(one)
-					out = append(out, int(n))
+					out = append(out, n)
 				}
 				return out
 			default:
 				n, _ := builtinToInt64(value)
-				return []int{int(n)}
+				return []int64{n}
 			}
 		},
 	})
@@ -639,9 +645,9 @@ func registerUintTypes() {
 		Value: func(value Any, config Var) Any {
 			n, _ := builtinToInt64(value)
 			if n < 0 {
-				return uint(0)
+				return int64(0)
 			}
-			return uint(n)
+			return n
 		},
 	})
 	registerBuiltin("[uint]", Type{
@@ -649,7 +655,14 @@ func registerUintTypes() {
 		Alias: []string{"array_uint", "array_uint64", "uints", "units"},
 		Valid: func(value Any, config Var) bool {
 			switch v := value.(type) {
-			case []uint:
+			case []uint, []uint64:
+				return true
+			case []int64:
+				for _, one := range v {
+					if one < 0 {
+						return false
+					}
+				}
 				return true
 			case []Any:
 				for _, one := range v {
@@ -666,16 +679,39 @@ func registerUintTypes() {
 		},
 		Value: func(value Any, config Var) Any {
 			switch v := value.(type) {
+			case []int64:
+				out := make([]int64, 0, len(v))
+				for _, one := range v {
+					if one < 0 {
+						one = 0
+					}
+					out = append(out, one)
+				}
+				return out
+			case []uint64:
+				out := make([]int64, 0, len(v))
+				for _, one := range v {
+					if one > uint64(^uint64(0)>>1) {
+						out = append(out, int64(^uint64(0)>>1))
+						continue
+					}
+					out = append(out, int64(one))
+				}
+				return out
 			case []uint:
-				return v
+				out := make([]int64, 0, len(v))
+				for _, one := range v {
+					out = append(out, int64(one))
+				}
+				return out
 			case []Any:
-				out := make([]uint, 0, len(v))
+				out := make([]int64, 0, len(v))
 				for _, one := range v {
 					n, _ := builtinToInt64(one)
 					if n < 0 {
 						n = 0
 					}
-					out = append(out, uint(n))
+					out = append(out, n)
 				}
 				return out
 			default:
@@ -683,7 +719,7 @@ func registerUintTypes() {
 				if n < 0 {
 					n = 0
 				}
-				return []uint{uint(n)}
+				return []int64{n}
 			}
 		},
 	})
@@ -725,6 +761,12 @@ func registerFloatTypes() {
 			switch v := value.(type) {
 			case []float64:
 				return v
+			case []float32:
+				out := make([]float64, 0, len(v))
+				for _, one := range v {
+					out = append(out, float64(one))
+				}
+				return out
 			case []Any:
 				out := make([]float64, 0, len(v))
 				for _, one := range v {
@@ -759,6 +801,7 @@ func registerStringTypes() {
 	})
 	registerBuiltin("[line]", Type{
 		Name:  "[line]",
+		Alias: []string{"lines"},
 		Valid: func(value Any, config Var) bool { return true },
 		Value: func(value Any, config Var) Any {
 			lines := strings.Split(builtinToText(value), "\n")
@@ -788,7 +831,8 @@ func registerTimeTypes() {
 		},
 	})
 	registerBuiltin("[date]", Type{
-		Name: "[date]",
+		Name:  "[date]",
+		Alias: []string{"dates"},
 		Valid: func(value Any, config Var) bool {
 			for _, one := range builtinToSlice(value) {
 				if _, ok := builtinParseDate(one); !ok {
@@ -821,7 +865,8 @@ func registerTimeTypes() {
 		},
 	})
 	registerBuiltin("[datetime]", Type{
-		Name: "[datetime]",
+		Name:  "[datetime]",
+		Alias: []string{"datetimes"},
 		Valid: func(value Any, config Var) bool {
 			for _, one := range builtinToSlice(value) {
 				if _, ok := builtinParseDateTime(one); !ok {
@@ -860,7 +905,8 @@ func registerTimeTypes() {
 		},
 	})
 	registerBuiltin("[timestamp]", Type{
-		Name: "[timestamp]",
+		Name:  "[timestamp]",
+		Alias: []string{"timestamps"},
 		Valid: func(value Any, config Var) bool {
 			for _, one := range builtinToSlice(value) {
 				if _, ok := builtinToInt64(one); ok {
@@ -925,7 +971,8 @@ func registerEnumTypes() {
 		},
 	})
 	registerBuiltin("[enum]", Type{
-		Name: "[enum]",
+		Name:  "[enum]",
+		Alias: []string{"enums"},
 		Valid: func(value Any, config Var) bool {
 			allowed := enumValues(config)
 			if len(allowed) == 0 {
